@@ -55,3 +55,23 @@ def save_user(user: UserSchema):
         }
     except Exception as e:
         return {"status": "error", "message": str(e)}
+
+
+
+# Add this route to main.py to fetch and view your saved entries
+@app.get("/view-users")
+def view_all_saved_users():
+    try:
+        saved_users = []
+        # Fetch all documents from the collection
+        for user in collection.find():
+            saved_users.append({
+                "id": str(user["_id"]),
+                "name": user["name"],
+                "age": user["age"],
+                "sex": user["sex"]
+            })
+        return {"status": "success", "total_records": len(saved_users), "data": saved_users}
+    except Exception as e:
+        return {"status": "error", "message": str(e)}
+
