@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Submit Form</title>
+</head>
+<body>
+
+    <h2>User Registration</h2>
+    <!-- Our Form -->
+    <form id="userForm">
+        <input type="text" id="name" placeholder="Name" required><br><br>
+        <input type="number" id="age" placeholder="Age" required><br><br>
+        <select id="sex" required>
+            <option value="">Select Sex</option>
+            <option value="Male">Male</option>
+            <option value="Female">Female</option>
+            <option value="Other">Other</option>
+        </select><br><br>
+        <button type="submit">Submit Data</button>
+    </form>
+
+    <h3 id="responseMessage"></h3>
+
+    <script>
+        const form = document.getElementById('userForm');
+        
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault(); // Prevents the page from refreshing
+
+            // 1. Gather data from inputs
+            const userData = {
+                name: document.getElementById('name').value,
+                age: parseInt(document.getElementById('age').value),
+                sex: document.getElementById('sex').value
+            };
+
+            // 2. Point to your Backend URL (Replace with your Render URL when deployed)
+            const backendUrl = 'https://onrender.com';
+
+            try {
+                // 3. Send the data to the Python Backend via a POST request
+                const response = await fetch(backendUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(userData)
+                });
+
+                const result = await response.json();
+                
+                // 4. Show the result on screen
+                document.getElementById('responseMessage').innerText = result.message;
+            } catch (error) {
+                document.getElementById('responseMessage').innerText = "Error connecting to server.";
+            }
+        });
+    </script>
+</body>
+</html>
