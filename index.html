@@ -78,6 +78,8 @@
 
             document.getElementById('responseMessage').innerText = "Submitting...";
 
+            const backendUrl = 'https://onrender.com';
+
             try {
                 // 3. Send payload over the internet to your Python API
                 const response = await fetch(backendUrl, {
