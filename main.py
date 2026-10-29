@@ -8,70 +8,46 @@ import os
 app = FastAPI()
 
 # 1. ALLOW FRONTEND TO CONNECT (CORS Settings)
-# This allows your Vercel frontend website to communicate with this backend securely.
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"], # In production, you can replace "*" with your actual Vercel URL
+    allow_origins=["*"], 
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
 # 2. CONNECT TO MONGODB DATABASE
-# Render will pull your actual database string safely from the Environment Variables.
-# If it can't find one, it will look for the fallback string provided below.
-MONGO_URI = os.getenv("MONGO_URI", "your_mongodb_connection_string_here")
+MONGO_URI = os.getenv("MONGO_URI", "mongodb+srv://pingtosani_db_user:LoUPLWvwNi2wNSQO@sanidb.nq0r9f4.mongodb.net")
 client = MongoClient(MONGO_URI)
 db = client["my_database"]
 collection = db["users"]
 
 # 3. DEFINE THE DATA STRUCTURE
-# This tells Python exactly what data properties to expect from the form.
 class UserSchema(BaseModel):
     name: str
     age: int
     sex: str
 
 # 4. HOME ROUTE
-# Added a home route so you can easily check if your server is online in a web browser.
 @app.get("/")
 def home():
     return {"status": "online", "message": "Python backend is running successfully!"}
 
-
-
-#Test DB
-# Add this route to your main.py to test the database link
+# 5. DIAGNOSTIC ROUTE TO CHECK MONGODB LINK
 @app.get("/test-db")
-def test_database_connection():
+def test_db():
     try:
-        # This sends a ping command to MongoDB Atlas
         client.admin.command('ping')
-        return {
-            "status": "success",
-            "message": "Backend connected to MongoDB perfectly!",
-            "database_connected": True
-        }
+        return {"status": "success", "database_connected": True}
     except Exception as e:
-        return {
-            "status": "error",
-            "message": "Backend is online, but CANNOT connect to MongoDB!",
-            "error_details": str(e),
-            "database_connected": False
-        }
+        return {"status": "error", "database_connected": False, "details": str(e)}
 
-# 6. SUBMIT FORM DATA ROUTE
-# This receives the data payload from the frontend and pushes it directly to MongoDB.
+# 6. SUBMIT FORM DATA ROUTE (The missing link!)
 @app.post("/submit")
 def save_user(user: UserSchema):
     try:
-        # Convert incoming data into standard Python dictionary format
         user_data = user.dict()
-        
-        # Insert the document into your MongoDB collection
         result = collection.insert_one(user_data)
-        
-        # Send a clean success response back to the user's browser
         return {
             "status": "success", 
             "message": f"Successfully saved {user.name} to the database!", 
