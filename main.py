@@ -38,7 +38,29 @@ class UserSchema(BaseModel):
 def home():
     return {"status": "online", "message": "Python backend is running successfully!"}
 
-# 5. SUBMIT FORM DATA ROUTE
+
+
+#Test DB
+# Add this route to your main.py to test the database link
+@app.get("/test-db")
+def test_database_connection():
+    try:
+        # This sends a ping command to MongoDB Atlas
+        client.admin.command('ping')
+        return {
+            "status": "success",
+            "message": "Backend connected to MongoDB perfectly!",
+            "database_connected": True
+        }
+    except Exception as e:
+        return {
+            "status": "error",
+            "message": "Backend is online, but CANNOT connect to MongoDB!",
+            "error_details": str(e),
+            "database_connected": False
+        }
+
+# 6. SUBMIT FORM DATA ROUTE
 # This receives the data payload from the frontend and pushes it directly to MongoDB.
 @app.post("/submit")
 def save_user(user: UserSchema):
